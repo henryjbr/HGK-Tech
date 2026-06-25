@@ -9,77 +9,87 @@ const localeToggle = document.querySelector("[data-locale-toggle]");
 const localeFlag = document.querySelector("[data-locale-flag]");
 const localeCode = document.querySelector("[data-locale-code]");
 const localeButtons = document.querySelectorAll("[data-lang]");
+const contactInfoTriggers = document.querySelectorAll("[data-contact-info-trigger]");
+let contactToastTimer = 0;
 
 const localeMeta = {
-  pt: { code: "BR", flag: "🇧🇷", lang: "pt-BR" },
-  es: { code: "ES", flag: "🇪🇸", lang: "es" },
-  en: { code: "EN", flag: "🇺🇸", lang: "en" },
+  pt: { code: "BR", flagSrc: "assets/br.jpg", lang: "pt-BR" },
+  es: { code: "ES", flagSrc: "assets/es.jpg", lang: "es" },
+  en: { code: "EN", flagSrc: "assets/us.png", lang: "en" },
 };
 
 const translations = {
   pt: {
     metaTitle: "HGK | Tecnologia para empresas que fazem acontecer",
-    metaDescription: "Solucoes digitais, automacao e inteligencia de dados para empresas que precisam crescer com eficiencia.",
+    metaDescription: "Soluções digitais, automação e inteligência de dados para empresas que precisam crescer com eficiência.",
+    detailMetaTitle: "HGK | Informações detalhadas",
+    detailMetaDescription: "Conheça em detalhes como a HGK estrutura projetos de tecnologia, automação, dados e sistemas para empresas.",
     "language.select": "Selecionar idioma",
     "nav.openMenu": "Abrir menu",
-    "nav.business": "Unidades de negocio",
-    "nav.products": "Produtos",
+    "nav.business": "Serviços",
+    "nav.products": "Contato",
     "nav.segments": "Segmentos",
     "nav.about": "Sobre",
-    "nav.call": "LIGAMOS PARA VOCE",
-    "nav.client": "SOU CLIENTE",
-    "hero.title": "TECNOLOGIA PARA SUA OPERACAO.",
-    "hero.copy": "Automacao, dados e sistemas integrados para sua empresa evoluir.",
+    "nav.call": "LIGAMOS PARA VOCÊ",
+    "nav.client": "RECEBER MAIS INFORMAÇÕES",
+    "contactToast.title": "Receber mais informações",
+    "contactToast.copy": "Cadastre seus dados na área de contato e a equipe HGK entrará em contato oferecendo o suporte necessário.",
+    "hero.title": "TECNOLOGIA PARA SUA OPERAÇÃO.",
+    "hero.copy": "Automação, dados e sistemas integrados para sua empresa evoluir.",
     "hero.button": "SAIBA MAIS",
     "trust.projects": "projetos entregues",
     "trust.sectorsNumber": "9 setores",
     "trust.sectors": "atendidos com tecnologia",
     "trust.monitoring": "monitoramento de sistemas",
-    "trust.clients": "clientes em evolucao continua",
+    "trust.clients": "clientes em evolução contínua",
     "intro.eyebrow": "Empresas que movem o mercado precisam de base digital",
-    "intro.title": "Conectamos estrategia, sistemas e pessoas em uma operacao mais fluida.",
-    "intro.copy1": "A HGK cria ambientes digitais para gestao empresarial, integrando processos comerciais, financeiros, logistica, atendimento e indicadores em uma unica visao de negocio.",
-    "intro.copy2": "Nosso trabalho combina consultoria, desenvolvimento e sustentacao para que a tecnologia deixe de ser obstaculo e passe a acelerar decisoes.",
-    "solutions.eyebrow": "Solucoes",
-    "solutions.title": "Portifolio para digitalizar a gestao da sua empresa.",
-    "solutions.card1.title": "Gestao integrada",
-    "solutions.card1.copy": "ERP, CRM e fluxos conectados para organizar rotinas, reduzir retrabalho e dar previsibilidade.",
-    "solutions.card2.title": "Automacao de processos",
-    "solutions.card2.copy": "Robos, formularios e integracoes que eliminam tarefas manuais e aceleram a operacao.",
+    "intro.title": "Conectamos estratégia, sistemas e pessoas em uma operação mais fluida.",
+    "intro.copy1": "A HGK cria ambientes digitais para gestão empresarial, integrando processos comerciais, financeiros, logística, atendimento e indicadores em uma única visão de negócio.",
+    "intro.copy2": "Nosso trabalho combina consultoria, desenvolvimento e sustentação para que a tecnologia deixe de ser obstáculo e passe a acelerar decisões.",
+    "solutions.eyebrow": "Serviços",
+    "solutions.title": "Quer saber mais sobre <span>Sistema de Gestão</span>?<br>Selecionamos alguns materiais para você:",
+    "solutions.card1.chip": "ERP + CRM",
+    "solutions.card1.title": "Gestão integrada",
+    "solutions.card1.copy": "Implantamos e conectamos sistemas para organizar vendas, financeiro, operação e atendimento em uma rotina única.",
+    "solutions.card2.chip": "Workflows",
+    "solutions.card2.title": "Automação de processos",
+    "solutions.card2.copy": "Criamos fluxos, formulários e robôs para reduzir tarefas repetitivas e dar velocidade ao time.",
+    "solutions.card3.chip": "BI + Dashboards",
     "solutions.card3.title": "Dados e analytics",
-    "solutions.card3.copy": "Paineis executivos, indicadores de performance e modelos de decisao orientados por dados.",
+    "solutions.card3.copy": "Montamos painéis executivos e indicadores para transformar dados em decisão clara e acionável.",
+    "solutions.card4.chip": "Sistemas sob medida",
+    "solutions.card4.title": "Desenvolvimento digital",
+    "solutions.card4.copy": "Desenvolvemos sistemas internos, portais, landing pages e ferramentas digitais alinhadas ao seu processo.",
+    "solutions.card5.chip": "APIs + Integrações",
+    "solutions.card5.title": "Integração de plataformas",
+    "solutions.card5.copy": "Conectamos ferramentas, bancos de dados e sistemas legados para eliminar retrabalho e centralizar informações.",
+    "solutions.card6.chip": "Consultoria contínua",
+    "solutions.card6.title": "Suporte e evolução",
+    "solutions.card6.copy": "Acompanhamos melhorias, sustentação e evolução dos sistemas para manter a tecnologia funcionando com o negócio.",
     "common.learnMore": "Saiba mais",
-    "segments.imageAlt": "Equipe analisando dados em um painel digital",
-    "segments.listLabel": "Segmentos atendidos",
-    "segments.eyebrow": "Segmentos",
-    "segments.title": "Atuamos perto da rotina de quem vende, produz, entrega e atende.",
-    "segments.list.services": "Servicos",
-    "segments.list.retail": "Varejo",
-    "segments.list.distribution": "Distribuicao",
-    "segments.list.health": "Saude",
-    "segments.list.education": "Educacao",
+    "segments.imageAlt": "Parceiros e colaboradores trabalhando em tecnologia",
+    "segments.listLabel": "Parceiros e colaboradores HGK",
+    "segments.eyebrow": "Parceiros HGK",
+    "segments.title": "Uma rede de colaboradores para entregar tecnologia com mais consistência.",
+    "segments.list.services": "Tecnologia",
+    "segments.list.retail": "Implantação",
+    "segments.list.distribution": "Dados",
+    "segments.list.health": "Suporte",
+    "segments.list.education": "Educação",
     "segments.list.industry": "Industria",
-    "segments.copy": "Cada implantacao parte do seu processo real: metas, gargalos, times envolvidos, sistemas legados e o nivel de maturidade digital da empresa.",
-    "results.eyebrow": "Inovacao na pratica",
-    "results.title": "Uma operacao mais inteligente aparece nos indicadores.",
-    "results.metric1": "menos tempo em tarefas administrativas apos automacoes.",
-    "results.metric2": "mais velocidade para consolidar relatorios gerenciais.",
-    "results.metric3": "para colocar os primeiros fluxos digitais em producao.",
-    "content.eyebrow": "Conteudos que ajudam sua empresa",
-    "content.title": "Ideias para entender tendencias e melhorar a gestao.",
-    "content.card1.alt": "Painel de dados em uma tela",
-    "content.card1.type": "Guia",
-    "content.card1.title": "Como escolher indicadores que realmente movem a operacao",
-    "content.card2.alt": "Profissionais em reuniao de planejamento",
-    "content.card2.type": "Artigo",
-    "content.card2.title": "Automacao empresarial: por onde comecar sem travar o time",
-    "content.card3.alt": "Pessoa trabalhando em notebook com graficos",
-    "content.card3.type": "Checklist",
-    "content.card3.title": "O que revisar antes de integrar sistemas internos",
-    "content.read": "Ler conteudo",
+    "segments.partner1.copy": "Plataformas, sistemas e ferramentas conectadas ao seu processo.",
+    "segments.partner2.copy": "Especialistas para estruturar rotinas, treinar times e acompanhar entregas.",
+    "segments.partner3.copy": "Colaboradores focados em indicadores, dashboards e tomada de decisão.",
+    "segments.partner4.copy": "Acompanhamento contínuo para evoluir a operação depois do go-live.",
+    "segments.copy": "A HGK trabalha com uma rede de parceiros e profissionais especializados para unir estratégia, execução e sustentação em cada projeto.",
+    "results.eyebrow": "Inovação na prática",
+    "results.title": "Uma operação mais inteligente aparece nos indicadores.",
+    "results.metric1": "menos tempo em tarefas administrativas após automações.",
+    "results.metric2": "mais velocidade para consolidar relatórios gerenciais.",
+    "results.metric3": "para colocar os primeiros fluxos digitais em produção.",
     "contact.eyebrow": "Conte com a HGK",
     "contact.title": "Vamos potencializar o crescimento da sua empresa.",
-    "form.label": "Formulario de contato",
+    "form.label": "Formulário de contato",
     "form.name": "Nome",
     "form.namePlaceholder": "Seu nome",
     "form.email": "E-mail",
@@ -93,22 +103,52 @@ const translations = {
     "form.option4": "Solicitar consultoria",
     "form.submit": "Solicitar contato",
     "form.success": "Contato solicitado",
-    "footer.copy": "© 2026 HGK. Tecnologia para gestao, dados e automacao.",
-    "footer.solutions": "Solucoes",
-    "footer.segments": "Segmentos",
+    "footer.copy": "© 2026 HGK. Tecnologia para gestão, dados e automação.",
+    "footer.solutions": "Soluções",
+    "footer.segments": "Parceiros",
     "footer.contact": "Contato",
+    "detail.back": "Voltar",
+    "detail.backAria": "Voltar para a página principal",
+    "detail.hero.eyebrow": "Visão detalhada",
+    "detail.hero.title": "Como a HGK transforma processos em <span>operações digitais</span> mais inteligentes.",
+    "detail.hero.copy": "Unimos consultoria, desenvolvimento, automação e dados para criar uma base tecnológica clara, escalável e alinhada ao funcionamento real da sua empresa.",
+    "detail.dashboard.kpi": "eficiência",
+    "detail.deliver.eyebrow": "O que entregamos",
+    "detail.deliver.title": "Projetos digitais com foco em gestão, produtividade e decisão.",
+    "detail.card1.title": "Diagnóstico operacional",
+    "detail.card1.copy": "Mapeamos processos, gargalos, sistemas existentes e oportunidades de automação antes de propor a solução.",
+    "detail.card2.title": "Sistemas e integrações",
+    "detail.card2.copy": "Conectamos ERP, CRM, formulários, dashboards, APIs e ferramentas internas em uma rotina mais fluida.",
+    "detail.card3.title": "Dados e indicadores",
+    "detail.card3.copy": "Criamos painéis executivos para acompanhar produtividade, performance comercial, operação e resultados.",
+    "detail.card4.title": "Evolução contínua",
+    "detail.card4.copy": "Acompanhamos melhorias, ajustes e sustentação para que a tecnologia continue acompanhando o negócio.",
+    "detail.process.eyebrow": "Método HGK",
+    "detail.process.title": "Da ideia ao uso diário.",
+    "detail.step1.title": "Entender",
+    "detail.step1.copy": "Objetivos, rotina, sistemas e dores da operação.",
+    "detail.step2.title": "Planejar",
+    "detail.step2.copy": "Prioridades, arquitetura, etapas e indicadores do projeto.",
+    "detail.step3.title": "Implementar",
+    "detail.step3.copy": "Desenvolvimento, integrações, automações e validações.",
+    "detail.step4.title": "Evoluir",
+    "detail.step4.copy": "Suporte, melhorias e acompanhamento dos resultados.",
   },
   en: {
     metaTitle: "HGK | Technology for companies that get things done",
     metaDescription: "Digital solutions, automation, and data intelligence for companies that need to grow efficiently.",
+    detailMetaTitle: "HGK | Detailed information",
+    detailMetaDescription: "Learn how HGK structures technology, automation, data, and systems projects for companies.",
     "language.select": "Select language",
     "nav.openMenu": "Open menu",
-    "nav.business": "Business units",
-    "nav.products": "Products",
+    "nav.business": "Services",
+    "nav.products": "Contact",
     "nav.segments": "Segments",
     "nav.about": "About",
     "nav.call": "WE CALL YOU",
-    "nav.client": "I AM A CLIENT",
+    "nav.client": "GET MORE INFORMATION",
+    "contactToast.title": "Get more information",
+    "contactToast.copy": "Submit your details in the contact area and the HGK team will reach out with the support you need.",
     "hero.title": "TECHNOLOGY FOR YOUR OPERATION.",
     "hero.copy": "Automation, data, and integrated systems to help your company evolve.",
     "hero.button": "LEARN MORE",
@@ -121,43 +161,47 @@ const translations = {
     "intro.title": "We connect strategy, systems, and people into a smoother operation.",
     "intro.copy1": "HGK creates digital environments for business management, integrating sales, finance, logistics, service, and indicators into one business view.",
     "intro.copy2": "Our work combines consulting, development, and support so technology stops being an obstacle and starts accelerating decisions.",
-    "solutions.eyebrow": "Solutions",
-    "solutions.title": "A portfolio to digitize your company's management.",
+    "solutions.eyebrow": "Services",
+    "solutions.title": "Want to know more about <span>management systems</span>?<br>We selected some materials for you:",
+    "solutions.card1.chip": "ERP + CRM",
     "solutions.card1.title": "Integrated management",
-    "solutions.card1.copy": "ERP, CRM, and connected workflows to organize routines, reduce rework, and create predictability.",
+    "solutions.card1.copy": "We implement and connect systems to organize sales, finance, operations, and support in one workflow.",
+    "solutions.card2.chip": "Workflows",
     "solutions.card2.title": "Process automation",
-    "solutions.card2.copy": "Bots, forms, and integrations that eliminate manual tasks and speed up operations.",
+    "solutions.card2.copy": "We create workflows, forms, and bots to reduce repetitive tasks and give teams more speed.",
+    "solutions.card3.chip": "BI + Dashboards",
     "solutions.card3.title": "Data and analytics",
-    "solutions.card3.copy": "Executive dashboards, performance indicators, and decision models guided by data.",
+    "solutions.card3.copy": "We build executive dashboards and indicators that turn data into clear, actionable decisions.",
+    "solutions.card4.chip": "Custom systems",
+    "solutions.card4.title": "Digital development",
+    "solutions.card4.copy": "We develop internal systems, portals, landing pages, and digital tools aligned with your process.",
+    "solutions.card5.chip": "APIs + Integrations",
+    "solutions.card5.title": "Platform integration",
+    "solutions.card5.copy": "We connect tools, databases, and legacy systems to eliminate rework and centralize information.",
+    "solutions.card6.chip": "Ongoing consulting",
+    "solutions.card6.title": "Support and evolution",
+    "solutions.card6.copy": "We support improvements, maintenance, and system evolution so technology keeps working with the business.",
     "common.learnMore": "Learn more",
-    "segments.imageAlt": "Team analyzing data on a digital dashboard",
-    "segments.listLabel": "Served segments",
-    "segments.eyebrow": "Segments",
-    "segments.title": "We work close to the routine of teams that sell, produce, deliver, and support.",
-    "segments.list.services": "Services",
-    "segments.list.retail": "Retail",
-    "segments.list.distribution": "Distribution",
-    "segments.list.health": "Healthcare",
+    "segments.imageAlt": "Partners and collaborators working with technology",
+    "segments.listLabel": "HGK partners and collaborators",
+    "segments.eyebrow": "HGK Partners",
+    "segments.title": "A collaborator network to deliver technology with more consistency.",
+    "segments.list.services": "Technology",
+    "segments.list.retail": "Implementation",
+    "segments.list.distribution": "Data",
+    "segments.list.health": "Support",
     "segments.list.education": "Education",
     "segments.list.industry": "Industry",
-    "segments.copy": "Every implementation starts from your real process: goals, bottlenecks, teams involved, legacy systems, and the company's digital maturity level.",
+    "segments.partner1.copy": "Platforms, systems, and tools connected to your process.",
+    "segments.partner2.copy": "Specialists to structure routines, train teams, and follow deliveries.",
+    "segments.partner3.copy": "Collaborators focused on indicators, dashboards, and decision-making.",
+    "segments.partner4.copy": "Ongoing follow-up to evolve operations after go-live.",
+    "segments.copy": "HGK works with a network of partners and specialized professionals to unite strategy, execution, and support in every project.",
     "results.eyebrow": "Innovation in practice",
     "results.title": "A smarter operation shows up in the indicators.",
     "results.metric1": "less time spent on administrative tasks after automation.",
     "results.metric2": "more speed to consolidate management reports.",
     "results.metric3": "to put the first digital workflows into production.",
-    "content.eyebrow": "Content that helps your company",
-    "content.title": "Ideas to understand trends and improve management.",
-    "content.card1.alt": "Data dashboard on a screen",
-    "content.card1.type": "Guide",
-    "content.card1.title": "How to choose indicators that truly move the operation",
-    "content.card2.alt": "Professionals in a planning meeting",
-    "content.card2.type": "Article",
-    "content.card2.title": "Business automation: where to start without blocking the team",
-    "content.card3.alt": "Person working on a laptop with charts",
-    "content.card3.type": "Checklist",
-    "content.card3.title": "What to review before integrating internal systems",
-    "content.read": "Read content",
     "contact.eyebrow": "Count on HGK",
     "contact.title": "Let's boost your company's growth.",
     "form.label": "Contact form",
@@ -175,70 +219,104 @@ const translations = {
     "form.submit": "Request contact",
     "form.success": "Request sent",
     "footer.copy": "© 2026 HGK. Technology for management, data, and automation.",
-    "footer.solutions": "Solutions",
-    "footer.segments": "Segments",
+    "footer.solutions": "Services",
+    "footer.segments": "Partners",
     "footer.contact": "Contact",
+    "detail.back": "Back",
+    "detail.backAria": "Back to the main page",
+    "detail.hero.eyebrow": "Detailed view",
+    "detail.hero.title": "How HGK turns processes into smarter <span>digital operations</span>.",
+    "detail.hero.copy": "We combine consulting, development, automation, and data to create a clear, scalable technology foundation aligned with how your company really works.",
+    "detail.dashboard.kpi": "efficiency",
+    "detail.deliver.eyebrow": "What we deliver",
+    "detail.deliver.title": "Digital projects focused on management, productivity, and decision-making.",
+    "detail.card1.title": "Operational diagnosis",
+    "detail.card1.copy": "We map processes, bottlenecks, existing systems, and automation opportunities before proposing a solution.",
+    "detail.card2.title": "Systems and integrations",
+    "detail.card2.copy": "We connect ERP, CRM, forms, dashboards, APIs, and internal tools into a smoother workflow.",
+    "detail.card3.title": "Data and indicators",
+    "detail.card3.copy": "We create executive dashboards to monitor productivity, commercial performance, operations, and results.",
+    "detail.card4.title": "Continuous evolution",
+    "detail.card4.copy": "We support improvements, adjustments, and maintenance so technology keeps pace with the business.",
+    "detail.process.eyebrow": "HGK Method",
+    "detail.process.title": "From idea to daily use.",
+    "detail.step1.title": "Understand",
+    "detail.step1.copy": "Goals, routines, systems, and operational pain points.",
+    "detail.step2.title": "Plan",
+    "detail.step2.copy": "Priorities, architecture, stages, and project indicators.",
+    "detail.step3.title": "Implement",
+    "detail.step3.copy": "Development, integrations, automation, and validation.",
+    "detail.step4.title": "Evolve",
+    "detail.step4.copy": "Support, improvements, and results monitoring.",
   },
   es: {
-    metaTitle: "HGK | Tecnologia para empresas que hacen que las cosas sucedan",
-    metaDescription: "Soluciones digitales, automatizacion e inteligencia de datos para empresas que necesitan crecer con eficiencia.",
+    metaTitle: "HGK | Tecnología para empresas que hacen que las cosas sucedan",
+    metaDescription: "Soluciones digitales, automatización e inteligencia de datos para empresas que necesitan crecer con eficiencia.",
+    detailMetaTitle: "HGK | Información detallada",
+    detailMetaDescription: "Conoce en detalle cómo HGK estructura proyectos de tecnología, automatización, datos y sistemas para empresas.",
     "language.select": "Seleccionar idioma",
-    "nav.openMenu": "Abrir menu",
-    "nav.business": "Unidades de negocio",
-    "nav.products": "Productos",
+    "nav.openMenu": "Abrir menú",
+    "nav.business": "Servicios",
+    "nav.products": "Contacto",
     "nav.segments": "Segmentos",
     "nav.about": "Sobre nosotros",
     "nav.call": "TE LLAMAMOS",
-    "nav.client": "SOY CLIENTE",
-    "hero.title": "TECNOLOGIA PARA TU OPERACION.",
-    "hero.copy": "Automatizacion, datos y sistemas integrados para que tu empresa evolucione.",
-    "hero.button": "SABER MAS",
+    "nav.client": "RECIBIR MÁS INFORMACIÓN",
+    "contactToast.title": "Recibir más información",
+    "contactToast.copy": "Registra tus datos en el área de contacto y el equipo HGK se pondrá en contacto con el soporte necesario.",
+    "hero.title": "TECNOLOGÍA PARA TU OPERACIÓN.",
+    "hero.copy": "Automatización, datos y sistemas integrados para que tu empresa evolucione.",
+    "hero.button": "SABER MÁS",
     "trust.projects": "proyectos entregados",
     "trust.sectorsNumber": "9 sectores",
-    "trust.sectors": "atendidos con tecnologia",
+    "trust.sectors": "atendidos con tecnología",
     "trust.monitoring": "monitoreo de sistemas",
-    "trust.clients": "clientes en evolucion continua",
+    "trust.clients": "clientes en evolución continua",
     "intro.eyebrow": "Las empresas que mueven el mercado necesitan una base digital",
-    "intro.title": "Conectamos estrategia, sistemas y personas en una operacion mas fluida.",
-    "intro.copy1": "HGK crea entornos digitales para la gestion empresarial, integrando procesos comerciales, financieros, logistica, atencion e indicadores en una unica vision del negocio.",
-    "intro.copy2": "Nuestro trabajo combina consultoria, desarrollo y soporte para que la tecnologia deje de ser un obstaculo y acelere decisiones.",
-    "solutions.eyebrow": "Soluciones",
-    "solutions.title": "Portafolio para digitalizar la gestion de tu empresa.",
-    "solutions.card1.title": "Gestion integrada",
-    "solutions.card1.copy": "ERP, CRM y flujos conectados para organizar rutinas, reducir retrabajo y dar previsibilidad.",
-    "solutions.card2.title": "Automatizacion de procesos",
-    "solutions.card2.copy": "Bots, formularios e integraciones que eliminan tareas manuales y aceleran la operacion.",
+    "intro.title": "Conectamos estrategia, sistemas y personas en una operación más fluida.",
+    "intro.copy1": "HGK crea entornos digitales para la gestión empresarial, integrando procesos comerciales, financieros, logística, atención e indicadores en una única visión del negocio.",
+    "intro.copy2": "Nuestro trabajo combina consultoría, desarrollo y soporte para que la tecnología deje de ser un obstáculo y acelere decisiones.",
+    "solutions.eyebrow": "Servicios",
+    "solutions.title": "¿Quieres saber más sobre <span>sistemas de gestión</span>?<br>Seleccionamos algunos materiales para ti:",
+    "solutions.card1.chip": "ERP + CRM",
+    "solutions.card1.title": "Gestión integrada",
+    "solutions.card1.copy": "Implementamos y conectamos sistemas para organizar ventas, finanzas, operación y atención en una sola rutina.",
+    "solutions.card2.chip": "Workflows",
+    "solutions.card2.title": "Automatización de procesos",
+    "solutions.card2.copy": "Creamos flujos, formularios y bots para reducir tareas repetitivas y dar velocidad al equipo.",
+    "solutions.card3.chip": "BI + Dashboards",
     "solutions.card3.title": "Datos y analytics",
-    "solutions.card3.copy": "Paneles ejecutivos, indicadores de rendimiento y modelos de decision orientados por datos.",
-    "common.learnMore": "Saber mas",
-    "segments.imageAlt": "Equipo analizando datos en un panel digital",
-    "segments.listLabel": "Segmentos atendidos",
-    "segments.eyebrow": "Segmentos",
-    "segments.title": "Actuamos cerca de la rutina de quienes venden, producen, entregan y atienden.",
-    "segments.list.services": "Servicios",
-    "segments.list.retail": "Retail",
-    "segments.list.distribution": "Distribucion",
-    "segments.list.health": "Salud",
-    "segments.list.education": "Educacion",
+    "solutions.card3.copy": "Creamos paneles ejecutivos e indicadores para transformar datos en decisiones claras y accionables.",
+    "solutions.card4.chip": "Sistemas a medida",
+    "solutions.card4.title": "Desarrollo digital",
+    "solutions.card4.copy": "Desarrollamos sistemas internos, portales, landing pages y herramientas digitales alineadas con tu proceso.",
+    "solutions.card5.chip": "APIs + Integraciones",
+    "solutions.card5.title": "Integración de plataformas",
+    "solutions.card5.copy": "Conectamos herramientas, bases de datos y sistemas heredados para eliminar retrabajo y centralizar información.",
+    "solutions.card6.chip": "Consultoría continua",
+    "solutions.card6.title": "Soporte y evolución",
+    "solutions.card6.copy": "Acompañamos mejoras, soporte y evolución de sistemas para mantener la tecnología funcionando con el negocio.",
+    "common.learnMore": "Saber más",
+    "segments.imageAlt": "Socios y colaboradores trabajando con tecnología",
+    "segments.listLabel": "Socios y colaboradores HGK",
+    "segments.eyebrow": "Socios HGK",
+    "segments.title": "Una red de colaboradores para entregar tecnología con más consistencia.",
+    "segments.list.services": "Tecnología",
+    "segments.list.retail": "Implementación",
+    "segments.list.distribution": "Datos",
+    "segments.list.health": "Soporte",
+    "segments.list.education": "Educación",
     "segments.list.industry": "Industria",
-    "segments.copy": "Cada implementacion parte de tu proceso real: metas, cuellos de botella, equipos involucrados, sistemas heredados y nivel de madurez digital de la empresa.",
-    "results.eyebrow": "Innovacion en la practica",
-    "results.title": "Una operacion mas inteligente aparece en los indicadores.",
-    "results.metric1": "menos tiempo en tareas administrativas despues de automatizaciones.",
-    "results.metric2": "mas velocidad para consolidar informes gerenciales.",
-    "results.metric3": "para poner los primeros flujos digitales en produccion.",
-    "content.eyebrow": "Contenidos que ayudan a tu empresa",
-    "content.title": "Ideas para entender tendencias y mejorar la gestion.",
-    "content.card1.alt": "Panel de datos en una pantalla",
-    "content.card1.type": "Guia",
-    "content.card1.title": "Como elegir indicadores que realmente mueven la operacion",
-    "content.card2.alt": "Profesionales en una reunion de planificacion",
-    "content.card2.type": "Articulo",
-    "content.card2.title": "Automatizacion empresarial: por donde empezar sin frenar al equipo",
-    "content.card3.alt": "Persona trabajando en una laptop con graficos",
-    "content.card3.type": "Checklist",
-    "content.card3.title": "Que revisar antes de integrar sistemas internos",
-    "content.read": "Leer contenido",
+    "segments.partner1.copy": "Plataformas, sistemas y herramientas conectadas a tu proceso.",
+    "segments.partner2.copy": "Especialistas para estructurar rutinas, entrenar equipos y acompañar entregas.",
+    "segments.partner3.copy": "Colaboradores enfocados en indicadores, dashboards y toma de decisiones.",
+    "segments.partner4.copy": "Seguimiento continuo para evolucionar la operación después del go-live.",
+    "segments.copy": "HGK trabaja con una red de socios y profesionales especializados para unir estrategia, ejecución y soporte en cada proyecto.",
+    "results.eyebrow": "Innovación en la práctica",
+    "results.title": "Una operación más inteligente aparece en los indicadores.",
+    "results.metric1": "menos tiempo en tareas administrativas después de automatizaciones.",
+    "results.metric2": "más velocidad para consolidar informes gerenciales.",
+    "results.metric3": "para poner los primeros flujos digitales en producción.",
     "contact.eyebrow": "Cuenta con HGK",
     "contact.title": "Vamos a potenciar el crecimiento de tu empresa.",
     "form.label": "Formulario de contacto",
@@ -252,13 +330,39 @@ const translations = {
     "form.option1": "Digitalizar procesos",
     "form.option2": "Integrar sistemas",
     "form.option3": "Crear dashboards",
-    "form.option4": "Solicitar consultoria",
+    "form.option4": "Solicitar consultoría",
     "form.submit": "Solicitar contacto",
     "form.success": "Solicitud enviada",
-    "footer.copy": "© 2026 HGK. Tecnologia para gestion, datos y automatizacion.",
-    "footer.solutions": "Soluciones",
-    "footer.segments": "Segmentos",
+    "footer.copy": "© 2026 HGK. Tecnología para gestión, datos y automatización.",
+    "footer.solutions": "Servicios",
+    "footer.segments": "Socios",
     "footer.contact": "Contacto",
+    "detail.back": "Volver",
+    "detail.backAria": "Volver a la página principal",
+    "detail.hero.eyebrow": "Visión detallada",
+    "detail.hero.title": "Cómo HGK transforma procesos en <span>operaciones digitales</span> más inteligentes.",
+    "detail.hero.copy": "Unimos consultoría, desarrollo, automatización y datos para crear una base tecnológica clara, escalable y alineada con el funcionamiento real de tu empresa.",
+    "detail.dashboard.kpi": "eficiencia",
+    "detail.deliver.eyebrow": "Lo que entregamos",
+    "detail.deliver.title": "Proyectos digitales enfocados en gestión, productividad y decisión.",
+    "detail.card1.title": "Diagnóstico operacional",
+    "detail.card1.copy": "Mapeamos procesos, cuellos de botella, sistemas existentes y oportunidades de automatización antes de proponer la solución.",
+    "detail.card2.title": "Sistemas e integraciones",
+    "detail.card2.copy": "Conectamos ERP, CRM, formularios, dashboards, APIs y herramientas internas en una rutina más fluida.",
+    "detail.card3.title": "Datos e indicadores",
+    "detail.card3.copy": "Creamos paneles ejecutivos para acompañar productividad, rendimiento comercial, operación y resultados.",
+    "detail.card4.title": "Evolución continua",
+    "detail.card4.copy": "Acompañamos mejoras, ajustes y soporte para que la tecnología siga acompañando al negocio.",
+    "detail.process.eyebrow": "Método HGK",
+    "detail.process.title": "De la idea al uso diario.",
+    "detail.step1.title": "Entender",
+    "detail.step1.copy": "Objetivos, rutina, sistemas y dolores de la operación.",
+    "detail.step2.title": "Planificar",
+    "detail.step2.copy": "Prioridades, arquitectura, etapas e indicadores del proyecto.",
+    "detail.step3.title": "Implementar",
+    "detail.step3.copy": "Desarrollo, integraciones, automatizaciones y validaciones.",
+    "detail.step4.title": "Evolucionar",
+    "detail.step4.copy": "Soporte, mejoras y seguimiento de resultados.",
   },
 };
 
@@ -272,13 +376,18 @@ function applyLanguage(language) {
   currentLanguage = translations[language] ? language : "pt";
   const meta = localeMeta[currentLanguage];
   const description = document.querySelector('meta[name="description"]');
+  const isDetailPage = document.body.classList.contains("detail-page");
 
   document.documentElement.lang = meta.lang;
-  document.title = translate("metaTitle");
-  if (description) description.setAttribute("content", translate("metaDescription"));
+  document.title = translate(isDetailPage ? "detailMetaTitle" : "metaTitle");
+  if (description) description.setAttribute("content", translate(isDetailPage ? "detailMetaDescription" : "metaDescription"));
 
   document.querySelectorAll("[data-i18n]").forEach((element) => {
     element.textContent = translate(element.dataset.i18n);
+  });
+
+  document.querySelectorAll("[data-i18n-html]").forEach((element) => {
+    element.innerHTML = translate(element.dataset.i18nHtml);
   });
 
   document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
@@ -293,7 +402,12 @@ function applyLanguage(language) {
     element.setAttribute("aria-label", translate(element.dataset.i18nAriaLabel));
   });
 
-  if (localeFlag) localeFlag.textContent = meta.flag;
+  if (localeFlag) {
+    const image = localeFlag.querySelector("img") || document.createElement("img");
+    image.src = meta.flagSrc;
+    image.alt = "";
+    localeFlag.replaceChildren(image);
+  }
   if (localeCode) localeCode.textContent = meta.code;
 
   localeButtons.forEach((button) => {
@@ -314,25 +428,72 @@ function toggleLocaleMenu() {
 }
 
 function updateHeader() {
-  header.classList.toggle("is-scrolled", window.scrollY > 24);
+  header?.classList.toggle("is-scrolled", window.scrollY > 24);
 }
 
-toggle.addEventListener("click", () => {
+function showContactInfoToast() {
+  window.clearTimeout(contactToastTimer);
+
+  const currentToast = document.querySelector(".support-toast");
+  currentToast?.remove();
+
+  const toast = document.createElement("div");
+  toast.className = "support-toast";
+  toast.setAttribute("role", "status");
+  toast.setAttribute("aria-live", "polite");
+  toast.innerHTML = `
+    <span class="support-toast__icon" aria-hidden="true"></span>
+    <span class="support-toast__content">
+      <strong>${translate("contactToast.title")}</strong>
+      <small>${translate("contactToast.copy")}</small>
+    </span>
+    <button class="support-toast__close" type="button" aria-label="Fechar aviso">×</button>
+  `;
+
+  document.body.append(toast);
+  requestAnimationFrame(() => toast.classList.add("is-visible"));
+
+  const closeToast = () => {
+    window.clearTimeout(contactToastTimer);
+    toast.classList.remove("is-visible");
+    toast.classList.add("is-leaving");
+    window.setTimeout(() => toast.remove(), 520);
+  };
+
+  toast.querySelector(".support-toast__close")?.addEventListener("click", closeToast);
+
+  contactToastTimer = window.setTimeout(() => {
+    closeToast();
+  }, 2200);
+}
+
+contactInfoTriggers.forEach((trigger) => {
+  trigger.addEventListener("click", (event) => {
+    event.preventDefault();
+    showContactInfoToast();
+
+    window.setTimeout(() => {
+      document.querySelector("#contato")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 450);
+  });
+});
+
+toggle?.addEventListener("click", () => {
   const isOpen = nav.classList.toggle("is-open");
   document.body.classList.toggle("nav-open", isOpen);
-  header.classList.toggle("nav-active", isOpen);
+  header?.classList.toggle("nav-active", isOpen);
   toggle.setAttribute("aria-expanded", String(isOpen));
 });
 
-nav.addEventListener("click", (event) => {
+nav?.addEventListener("click", (event) => {
   if (!event.target.closest("a")) return;
   nav.classList.remove("is-open");
   document.body.classList.remove("nav-open");
-  header.classList.remove("nav-active");
+  header?.classList.remove("nav-active");
   toggle.setAttribute("aria-expanded", "false");
 });
 
-form.addEventListener("submit", (event) => {
+form?.addEventListener("submit", (event) => {
   event.preventDefault();
   const button = form.querySelector("button");
   button.textContent = translate("form.success");
@@ -497,7 +658,73 @@ function initTechCanvas() {
   start();
 }
 
+function initScrollReveal() {
+  const revealGroups = [
+    ".intro-visual",
+    ".intro-text .section-heading",
+    ".intro-copy p",
+    ".solutions .section-heading",
+    ".solution-card",
+    ".feature-image",
+    ".feature-content",
+    ".innovation .section-heading",
+    ".metric-grid article",
+    ".final-cta > div",
+    ".contact-form",
+    ".site-footer > *",
+    ".detail-hero-copy > *",
+    ".detail-hero-panel",
+    ".detail-heading > *",
+    ".detail-grid article",
+    ".detail-process > div",
+    ".detail-process li",
+  ];
+
+  const elements = [...document.querySelectorAll(revealGroups.join(","))];
+  if (!elements.length) return;
+
+  const groupedSelectors = [".solution-card", ".metric-grid article", ".intro-copy p", ".detail-grid article", ".detail-process li"];
+
+  elements.forEach((element) => {
+    element.classList.add("reveal-element");
+
+    const parent = groupedSelectors.find((selector) => element.matches(selector));
+    if (!parent) return;
+
+    const siblings = [...element.parentElement.querySelectorAll(parent)];
+    const delayStep = element.matches(".detail-grid article") ? 35 : 55;
+    element.style.setProperty("--reveal-delay", `${siblings.indexOf(element) * delayStep}ms`);
+  });
+
+  if (reduceMotion.matches || !("IntersectionObserver" in window)) {
+    elements.forEach((element) => element.classList.add("is-visible"));
+    return;
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      const exitsAbove = entry.boundingClientRect.top < 0;
+
+      if (entry.isIntersecting) {
+        entry.target.classList.add("is-visible");
+        entry.target.classList.remove("is-exiting-up", "is-exiting-down");
+        return;
+      }
+
+      entry.target.classList.remove("is-visible");
+      entry.target.classList.toggle("is-exiting-up", exitsAbove);
+      entry.target.classList.toggle("is-exiting-down", !exitsAbove);
+    });
+  }, {
+    rootMargin: "-4% 0px -8% 0px",
+    threshold: 0.22,
+  });
+
+  elements.forEach((element) => observer.observe(element));
+}
+
 updateHeader();
 applyLanguage(localStorage.getItem("hgk-language") || "pt");
 initTechCanvas();
+initScrollReveal();
 window.addEventListener("scroll", updateHeader, { passive: true });
