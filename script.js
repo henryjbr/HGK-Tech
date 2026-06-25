@@ -11,6 +11,124 @@ const localeCode = document.querySelector("[data-locale-code]");
 const localeButtons = document.querySelectorAll("[data-lang]");
 const contactInfoTriggers = document.querySelectorAll("[data-contact-info-trigger]");
 let contactToastTimer = 0;
+let contactFormStarted = false;
+
+const supabaseConfig = window.HGK_SUPABASE || {};
+const trackingState = {
+  visitorId: getStoredId("hgk-visitor-id"),
+  sessionId: getStoredId("hgk-session-id", true),
+};
+
+function getStoredId(key, sessionOnly = false) {
+  const storage = sessionOnly ? sessionStorage : localStorage;
+  const current = storage.getItem(key);
+  if (current) return current;
+
+  const value = globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  storage.setItem(key, value);
+  return value;
+}
+
+function hasSupabaseConfig() {
+  return Boolean(
+    supabaseConfig.url &&
+      supabaseConfig.anonKey &&
+      !supabaseConfig.url.includes("SEU-PROJETO") &&
+      !supabaseConfig.anonKey.includes("SUA_CHAVE")
+  );
+}
+
+function supabaseEndpoint(table) {
+  return `${supabaseConfig.url.replace(/\/$/, "")}/rest/v1/${table}`;
+}
+
+async function supabaseInsert(table, payload) {
+  if (!hasSupabaseConfig()) return { skipped: true };
+
+  const response = await fetch(supabaseEndpoint(table), {
+    method: "POST",
+    headers: {
+      apikey: supabaseConfig.anonKey,
+      Authorization: `Bearer ${supabaseConfig.anonKey}`,
+      "Content-Type": "application/json",
+      Prefer: "return=minimal",
+    },
+    body: JSON.stringify(payload),
+    keepalive: true,
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Supabase insert failed: ${response.status} ${errorText}`);
+  }
+
+  return { ok: true };
+}
+
+function isMissingPhoneColumnError(error) {
+  return error.message.includes("phone") && error.message.includes("schema cache");
+}
+
+async function submitContactSubmission(payload) {
+  try {
+    return await supabaseInsert("contact_submissions", payload);
+  } catch (error) {
+    if ("phone" in payload && isMissingPhoneColumnError(error)) {
+      const fallbackPayload = { ...payload };
+      delete fallbackPayload.phone;
+      return supabaseInsert("contact_submissions", fallbackPayload);
+    }
+
+    throw error;
+  }
+}
+
+function baseTrackingPayload() {
+  return {
+    page_path: `${location.pathname}${location.search}${location.hash}`,
+    page_title: document.title,
+    language: currentLanguage,
+    visitor_id: trackingState.visitorId,
+    session_id: trackingState.sessionId,
+  };
+}
+
+function trackEvent(eventName, details = {}) {
+  const payload = {
+    event_name: eventName,
+    ...baseTrackingPayload(),
+    ...details,
+    metadata: {
+      viewport_width: window.innerWidth,
+      viewport_height: window.innerHeight,
+      ...details.metadata,
+    },
+  };
+
+  supabaseInsert("analytics_events", payload).catch(() => {});
+}
+
+function contactPayloadFromForm(contactForm) {
+  const data = new FormData(contactForm);
+  const phone = String(data.get("telefone") || "").trim();
+
+  const payload = {
+    name: String(data.get("nome") || "").trim(),
+    email: String(data.get("email") || "").trim(),
+    company: String(data.get("empresa") || "").trim() || null,
+    goal: String(data.get("objetivo") || "").trim() || null,
+    language: currentLanguage,
+    page_path: `${location.pathname}${location.search}`,
+    referrer: document.referrer || null,
+    user_agent: navigator.userAgent,
+    visitor_id: trackingState.visitorId,
+    session_id: trackingState.sessionId,
+  };
+
+  if (phone) payload.phone = phone;
+
+  return payload;
+}
 
 const localeMeta = {
   pt: { code: "BR", flagSrc: "assets/br.jpg", lang: "pt-BR" },
@@ -94,6 +212,8 @@ const translations = {
     "form.namePlaceholder": "Seu nome",
     "form.email": "E-mail",
     "form.emailPlaceholder": "voce@empresa.com",
+    "form.phone": "WhatsApp",
+    "form.phonePlaceholder": "(11) 99999-9999",
     "form.company": "Empresa",
     "form.companyPlaceholder": "Nome da empresa",
     "form.goal": "Objetivo",
@@ -209,6 +329,8 @@ const translations = {
     "form.namePlaceholder": "Your name",
     "form.email": "Email",
     "form.emailPlaceholder": "you@company.com",
+    "form.phone": "WhatsApp",
+    "form.phonePlaceholder": "+1 555 000 0000",
     "form.company": "Company",
     "form.companyPlaceholder": "Company name",
     "form.goal": "Goal",
@@ -324,6 +446,8 @@ const translations = {
     "form.namePlaceholder": "Tu nombre",
     "form.email": "E-mail",
     "form.emailPlaceholder": "tu@empresa.com",
+    "form.phone": "WhatsApp",
+    "form.phonePlaceholder": "+55 11 99999-9999",
     "form.company": "Empresa",
     "form.companyPlaceholder": "Nombre de la empresa",
     "form.goal": "Objetivo",
@@ -493,17 +617,48 @@ nav?.addEventListener("click", (event) => {
   toggle.setAttribute("aria-expanded", "false");
 });
 
-form?.addEventListener("submit", (event) => {
+form?.addEventListener("focusin", () => {
+  if (contactFormStarted) return;
+  contactFormStarted = true;
+  trackEvent("contact_focus");
+});
+
+form?.addEventListener("submit", async (event) => {
   event.preventDefault();
   const button = form.querySelector("button");
-  button.textContent = translate("form.success");
+  const originalText = translate("form.submit");
+
+  button.textContent = "Enviando...";
   button.disabled = true;
 
-  window.setTimeout(() => {
-    button.textContent = translate("form.submit");
+  try {
+    const payload = contactPayloadFromForm(form);
+    await submitContactSubmission(payload);
+    trackEvent("contact_submit", {
+      metadata: {
+        company: payload.company,
+        goal: payload.goal,
+        has_company: Boolean(payload.company),
+      },
+    });
+
+    button.textContent = translate("form.success");
+    window.setTimeout(() => {
+      button.textContent = originalText;
+      button.disabled = false;
+      form.reset();
+      contactFormStarted = false;
+    }, 2200);
+  } catch (error) {
+    trackEvent("contact_submit_error", {
+      metadata: {
+        message: error.message,
+      },
+    });
+
+    button.textContent = "Tente novamente";
     button.disabled = false;
-    form.reset();
-  }, 2200);
+  }
 });
 
 localeToggle?.addEventListener("click", (event) => {
@@ -614,7 +769,7 @@ function initTechCanvas() {
 
   function render(timestamp = 0) {
     if (!isVisible || document.hidden) {
-      animationFrame = window.requestAnimationFrame(render);
+      animationFrame = 0;
       return;
     }
 
@@ -643,8 +798,19 @@ function initTechCanvas() {
     render();
   }
 
+  function resume() {
+    if (!animationFrame && isVisible && !document.hidden && !reduceMotion.matches) {
+      animationFrame = window.requestAnimationFrame(render);
+    }
+  }
+
   const observer = new IntersectionObserver(([entry]) => {
     isVisible = entry.isIntersecting;
+    if (isVisible) resume();
+    else {
+      window.cancelAnimationFrame(animationFrame);
+      animationFrame = 0;
+    }
   });
 
   observer.observe(techCanvas);
@@ -654,6 +820,7 @@ function initTechCanvas() {
     window.clearTimeout(resizeTimer);
     resizeTimer = window.setTimeout(start, 160);
   }, { passive: true });
+  document.addEventListener("visibilitychange", resume);
   reduceMotion.addEventListener("change", start);
   start();
 }
@@ -723,8 +890,58 @@ function initScrollReveal() {
   elements.forEach((element) => observer.observe(element));
 }
 
+function initAnalytics() {
+  trackEvent("page_view", {
+    metadata: {
+      referrer: document.referrer || null,
+    },
+  });
+
+  document.addEventListener("click", (event) => {
+    const link = event.target.closest("a, button");
+    if (!link) return;
+
+    const label = (link.textContent || link.getAttribute("aria-label") || "").trim().slice(0, 120);
+    const href = link.getAttribute("href") || null;
+    const isContactLink = href === "#contato" || link.matches("[data-contact-info-trigger]");
+    const isPrimaryCta = link.classList.contains("button") || link.classList.contains("header-client") || isContactLink;
+
+    trackEvent(isPrimaryCta ? "cta_click" : "interaction_click", {
+      element_label: label || null,
+      element_href: href,
+      metadata: {
+        classes: link.className || null,
+      },
+    });
+  }, { passive: true });
+
+  const sections = [...document.querySelectorAll("section[id], main > section")];
+  if (!sections.length || !("IntersectionObserver" in window)) return;
+
+  const seenSections = new Set();
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+
+      const sectionId = entry.target.id || entry.target.className || "section";
+      if (seenSections.has(sectionId)) return;
+
+      seenSections.add(sectionId);
+      trackEvent("section_view", {
+        section_id: String(sectionId).slice(0, 120),
+      });
+      observer.unobserve(entry.target);
+    });
+  }, {
+    threshold: 0.36,
+  });
+
+  sections.forEach((section) => observer.observe(section));
+}
+
 updateHeader();
 applyLanguage(localStorage.getItem("hgk-language") || "pt");
+initAnalytics();
 initTechCanvas();
 initScrollReveal();
 window.addEventListener("scroll", updateHeader, { passive: true });

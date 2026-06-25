@@ -8,7 +8,6 @@
       name="description"
       content="Soluções digitais, automação e inteligência de dados para empresas que precisam crescer com eficiência."
     />
-    <link rel="preconnect" href="https://images.unsplash.com" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -132,8 +131,10 @@
           <article class="solution-card">
             <div class="solution-visual">
               <img
-                src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=900&q=82"
+                src="./assets/Erp.jpg"
                 alt="Mesa de trabalho com gráficos e planejamento de gestão empresarial"
+                loading="lazy"
+                decoding="async"
               />
             </div>
             <span class="icon" aria-hidden="true">01</span>
@@ -145,8 +146,10 @@
           <article class="solution-card">
             <div class="solution-visual">
               <img
-                src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=900&q=82"
+                src="./assets/emp.jpg"
                 alt="Equipe colaborando em fluxo de trabalho e automação de processos"
+                loading="lazy"
+                decoding="async"
               />
             </div>
             <span class="icon" aria-hidden="true">02</span>
@@ -158,8 +161,10 @@
           <article class="solution-card">
             <div class="solution-visual">
               <img
-                src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=900&q=82"
+                src="./assets/Erp.jpg"
                 alt="Painel digital com dados, gráficos e indicadores de performance"
+                loading="lazy"
+                decoding="async"
               />
             </div>
             <span class="icon" aria-hidden="true">03</span>
@@ -171,8 +176,10 @@
           <article class="solution-card">
             <div class="solution-visual">
               <img
-                src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=82"
+                src="./assets/emp.jpg"
                 alt="Notebook com interface digital para desenvolvimento de sistemas"
+                loading="lazy"
+                decoding="async"
               />
             </div>
             <span class="icon" aria-hidden="true">04</span>
@@ -249,6 +256,10 @@
             <input type="email" name="email" autocomplete="email" placeholder="voce@empresa.com" data-i18n-placeholder="form.emailPlaceholder" required />
           </label>
           <label>
+            <span data-i18n="form.phone">WhatsApp</span>
+            <input type="tel" name="telefone" autocomplete="tel" placeholder="(11) 99999-9999" data-i18n-placeholder="form.phonePlaceholder" />
+          </label>
+          <label>
             <span data-i18n="form.company">Empresa</span>
             <input type="text" name="empresa" autocomplete="organization" placeholder="Nome da empresa" data-i18n-placeholder="form.companyPlaceholder" />
           </label>
@@ -281,6 +292,7 @@
       </div>
     </footer>
 
+    <script src="supabase-config.js"></script>
     <script src="script.js"></script>
   </body>
 </html>
