@@ -1,0 +1,12 @@
+node_modules/
+.npm-cache/
+www/
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android-sdk/
+android-commandlinetools.zip
+*.jks
+*.keystore
+keystore.properties

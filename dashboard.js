@@ -16,9 +16,10 @@ const teamMessage = document.querySelector("[data-team-message]");
 const teamList = document.querySelector("[data-team-list]");
 const loginEventsList = document.querySelector("[data-login-events]");
 
-const sessionKey = "hgk-dashboard-session";
 const themeKey = "hgk-dashboard-theme";
-let dashboardSession = readSession();
+const idleTimeoutMs = 15 * 60 * 1000;
+let dashboardSession = null;
+let idleTimer = null;
 let contactsCache = [];
 let dailyCache = [];
 let teamCache = [];
@@ -73,22 +74,27 @@ function baseUrl() {
   return config.url.replace(/\/$/, "");
 }
 
-function readSession() {
-  try {
-    return JSON.parse(localStorage.getItem(sessionKey) || "null");
-  } catch {
-    return null;
-  }
-}
-
 function saveSession(session) {
   dashboardSession = session;
-  localStorage.setItem(sessionKey, JSON.stringify(session));
+  resetIdleTimer();
 }
 
 function clearSession() {
   dashboardSession = null;
-  localStorage.removeItem(sessionKey);
+  window.clearTimeout(idleTimer);
+}
+
+function resetIdleTimer() {
+  if (!dashboardSession) return;
+  window.clearTimeout(idleTimer);
+  idleTimer = window.setTimeout(async () => {
+    try {
+      await logout();
+    } catch {
+    }
+    clearSession();
+    showLogin("Sessao encerrada apos 15 minutos sem atividade.");
+  }, idleTimeoutMs);
 }
 
 function showLoading() {
@@ -114,13 +120,25 @@ function authHeaders() {
 }
 
 async function request(path, options = {}) {
-  const response = await fetch(`${baseUrl()}${path}`, {
-    ...options,
-    headers: {
-      ...authHeaders(),
-      ...options.headers,
-    },
-  });
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), 15000);
+  let response;
+
+  try {
+    response = await fetch(`${baseUrl()}${path}`, {
+      ...options,
+      cache: "no-store",
+      credentials: "omit",
+      referrerPolicy: "no-referrer",
+      signal: controller.signal,
+      headers: {
+        ...authHeaders(),
+        ...options.headers,
+      },
+    });
+  } finally {
+    window.clearTimeout(timeout);
+  }
 
   if (!response.ok) {
     if (response.status === 401) {
@@ -136,9 +154,9 @@ async function request(path, options = {}) {
   return text ? JSON.parse(text) : null;
 }
 
-async function optionalRequest(path, fallback = []) {
+async function optionalRequest(path, fallback = [], options = {}) {
   try {
-    return await request(path);
+    return await request(path, options);
   } catch {
     return fallback;
   }
@@ -147,6 +165,9 @@ async function optionalRequest(path, fallback = []) {
 async function login(email, password) {
   const response = await fetch(`${baseUrl()}/auth/v1/token?grant_type=password`, {
     method: "POST",
+    cache: "no-store",
+    credentials: "omit",
+    referrerPolicy: "no-referrer",
     headers: {
       apikey: config.anonKey,
       "Content-Type": "application/json",
@@ -161,49 +182,13 @@ async function login(email, password) {
   return response.json();
 }
 
-async function createAuthUser(email, password) {
-  const response = await fetch(`${baseUrl()}/auth/v1/signup`, {
-    method: "POST",
-    headers: {
-      apikey: config.anonKey,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ email, password }),
-  });
-
-  if (!response.ok) {
-    let message = "";
-    try {
-      const payload = await response.json();
-      message = payload.msg || payload.message || payload.error_description || payload.error || JSON.stringify(payload);
-    } catch {
-      message = await response.text();
-    }
-    throw new Error(`Auth: ${message || response.status}`);
-  }
-
-  return response.json();
-}
-
-function isExistingAuthUserError(message) {
-  return /already|registered|exists|ja existe|cadastrad/i.test(message);
-}
-
-function isAuthSignupBlockedError(message) {
-  return /signup|signups|not allowed|disabled|cadastro|desabilitad|habilitad/i.test(message);
-}
-
 async function authorizeDashboardMember(email, fullName) {
-  await request("/rest/v1/dashboard_admins?on_conflict=email", {
+  await request("/rest/v1/rpc/authorize_dashboard_member", {
     method: "POST",
-    headers: {
-      Prefer: "resolution=merge-duplicates,return=minimal",
-    },
+    headers: { Prefer: "return=minimal" },
     body: JSON.stringify({
-      email,
-      full_name: fullName,
-      role: "operador",
-      is_active: true,
+      member_email: email,
+      member_name: fullName,
     }),
   });
 }
@@ -213,20 +198,21 @@ async function logout() {
 
   await fetch(`${baseUrl()}/auth/v1/logout`, {
     method: "POST",
+    cache: "no-store",
+    credentials: "omit",
+    referrerPolicy: "no-referrer",
     headers: authHeaders(),
   });
 }
 
 async function recordLoginEvent(eventType) {
-  const email = dashboardSession?.user?.email;
-  if (!email || !hasConfig()) return;
+  if (!dashboardSession?.user?.email || !hasConfig()) return;
 
   try {
-    await request("/rest/v1/dashboard_login_events", {
+    await request("/rest/v1/rpc/record_dashboard_login", {
       method: "POST",
       headers: { Prefer: "return=minimal" },
       body: JSON.stringify({
-        email,
         event_type: eventType,
         user_agent: navigator.userAgent,
       }),
@@ -435,10 +421,16 @@ async function loadDashboard() {
   }
 
   const [contacts, days, members, loginEvents] = await Promise.all([
-    request("/rest/v1/contact_submissions?select=*&order=created_at.desc&limit=100"),
+    request("/rest/v1/rpc/list_contact_submissions", {
+      method: "POST",
+      body: JSON.stringify({ result_limit: 100 }),
+    }),
     request("/rest/v1/analytics_daily_summary?select=*&order=day.desc&limit=14"),
     optionalRequest("/rest/v1/dashboard_admins?select=*&order=created_at.desc"),
-    optionalRequest("/rest/v1/dashboard_login_events?select=*&order=created_at.desc&limit=30"),
+    optionalRequest("/rest/v1/rpc/list_dashboard_logins", [], {
+      method: "POST",
+      body: "{}",
+    }),
   ]);
 
   contactsCache = contacts || [];
@@ -488,10 +480,10 @@ contactsTable?.addEventListener("change", async (event) => {
   if (!select) return;
 
   const id = select.dataset.contactStatus;
-  await request(`/rest/v1/contact_submissions?id=eq.${encodeURIComponent(id)}`, {
-    method: "PATCH",
+  await request("/rest/v1/rpc/update_contact_status", {
+    method: "POST",
     headers: { Prefer: "return=minimal" },
-    body: JSON.stringify({ status: select.value }),
+    body: JSON.stringify({ contact_id: id, next_status: select.value }),
   });
 
   const contact = contactsCache.find((item) => item.id === id);
@@ -507,43 +499,26 @@ teamForm?.addEventListener("submit", async (event) => {
   const button = teamForm.querySelector("button");
   const data = new FormData(teamForm);
   const email = String(data.get("email") || "").trim().toLowerCase();
-  const password = String(data.get("password") || "");
   const fullName = String(data.get("name") || "").trim() || null;
 
-  if (!email || password.length < 6) {
-    teamMessage.textContent = "Informe email e uma senha com no minimo 6 caracteres.";
+  if (!email) {
+    teamMessage.textContent = "Informe o email do usuario ja criado no Supabase Auth.";
     return;
   }
 
   button.disabled = true;
-  button.textContent = "Criando...";
+  button.textContent = "Autorizando...";
 
   try {
-    await createAuthUser(email, password);
     await authorizeDashboardMember(email, fullName);
-
-    teamMessage.textContent = "Acesso criado e autorizado.";
+    teamMessage.textContent = "Usuario existente autorizado com sucesso.";
     teamForm.reset();
     await loadDashboard();
   } catch (error) {
-    if (isExistingAuthUserError(error.message)) {
-      await authorizeDashboardMember(email, fullName);
-      teamMessage.textContent = "Este email ja existe no Auth. Autorizei o acesso no dashboard.";
-      await loadDashboard();
-      return;
-    }
-
-    if (isAuthSignupBlockedError(error.message)) {
-      await authorizeDashboardMember(email, fullName);
-      teamMessage.textContent = "Funcionario autorizado no dashboard. Para ele entrar, habilite Auth > Providers > Email > Signups no Supabase ou crie esse usuario manualmente no Auth.";
-      await loadDashboard();
-      return;
-    }
-
-    teamMessage.textContent = `Nao foi possivel criar o usuario no Auth: ${error.message.replace(/^Auth:\s*/i, "")}`;
+    teamMessage.textContent = "Nao foi possivel autorizar. Crie o usuario no Supabase Auth e confirme que sua conta tem perfil proprietario.";
   } finally {
     button.disabled = false;
-    button.textContent = "Criar acesso";
+    button.textContent = "Autorizar acesso";
   }
 });
 
@@ -590,11 +565,8 @@ logoutButton?.addEventListener("click", async () => {
 
 applyTheme(preferredTheme());
 
-if (dashboardSession?.access_token && hasConfig()) {
-  showLoading();
-  loadDashboard()
-    .catch((error) => showLogin(error.message))
-    .finally(hideLoading);
-} else {
-  showLogin(hasConfig() ? "" : "Preencha supabase-config.js com URL e anon key.");
-}
+["pointerdown", "keydown", "touchstart"].forEach((eventName) => {
+  document.addEventListener(eventName, resetIdleTimer, { passive: true });
+});
+
+showLogin(hasConfig() ? "" : "Preencha supabase-config.js com URL e anon key.");

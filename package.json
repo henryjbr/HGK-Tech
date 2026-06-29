@@ -1,0 +1,18 @@
+{
+  "name": "hgk-dashboard-mobile",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Aplicativo Android seguro para o dashboard HGK",
+  "scripts": {
+    "build:web": "node tools/build-mobile.mjs",
+    "android:sync": "npm run build:web && npx cap sync android",
+    "android:apk": "npm run android:sync && cd android && gradlew.bat assembleDebug"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.4.1",
+    "@capacitor/core": "8.4.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.4.1"
+  }
+}

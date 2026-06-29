@@ -3,6 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="no-referrer" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://cvfxiiyudzyuixkkxbaf.supabase.co; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests" />
     <title>HGK | Dashboard</title>
     <link rel="stylesheet" href="dashboard.css" />
   </head>
@@ -59,11 +61,11 @@
         <form class="login-form" data-login-form>
           <label>
             <span>Email</span>
-            <input type="email" name="email" autocomplete="email" required />
+            <input type="email" name="email" autocomplete="email" maxlength="254" required />
           </label>
           <label>
             <span>Senha</span>
-            <input type="password" name="password" autocomplete="current-password" required />
+            <input type="password" name="password" autocomplete="current-password" maxlength="128" required />
           </label>
           <button type="submit">Entrar</button>
           <p class="form-message" data-login-message></p>
@@ -162,17 +164,13 @@
           <form class="team-form" data-team-form>
             <label>
               <span>Nome</span>
-              <input type="text" name="name" autocomplete="name" placeholder="Nome do funcionario" />
+              <input type="text" name="name" autocomplete="name" maxlength="120" placeholder="Nome do funcionario" />
             </label>
             <label>
               <span>Email</span>
-              <input type="email" name="email" autocomplete="email" placeholder="funcionario@empresa.com" required />
+              <input type="email" name="email" autocomplete="email" maxlength="254" placeholder="funcionario@empresa.com" required />
             </label>
-            <label>
-              <span>Senha inicial</span>
-              <input type="password" name="password" autocomplete="new-password" placeholder="Minimo 6 caracteres" required />
-            </label>
-            <button type="submit">Criar acesso</button>
+            <button type="submit">Autorizar acesso</button>
             <p class="form-message" data-team-message></p>
           </form>
 

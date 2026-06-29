@@ -38,15 +38,18 @@ function hasSupabaseConfig() {
   );
 }
 
-function supabaseEndpoint(table) {
-  return `${supabaseConfig.url.replace(/\/$/, "")}/rest/v1/${table}`;
+function supabaseEndpoint(path) {
+  return `${supabaseConfig.url.replace(/\/$/, "")}/rest/v1/${path}`;
 }
 
-async function supabaseInsert(table, payload) {
+async function supabaseRpc(functionName, payload) {
   if (!hasSupabaseConfig()) return { skipped: true };
 
-  const response = await fetch(supabaseEndpoint(table), {
+  const response = await fetch(supabaseEndpoint(`rpc/${functionName}`), {
     method: "POST",
+    cache: "no-store",
+    credentials: "omit",
+    referrerPolicy: "strict-origin-when-cross-origin",
     headers: {
       apikey: supabaseConfig.anonKey,
       Authorization: `Bearer ${supabaseConfig.anonKey}`,
@@ -65,22 +68,20 @@ async function supabaseInsert(table, payload) {
   return { ok: true };
 }
 
-function isMissingPhoneColumnError(error) {
-  return error.message.includes("phone") && error.message.includes("schema cache");
-}
-
 async function submitContactSubmission(payload) {
-  try {
-    return await supabaseInsert("contact_submissions", payload);
-  } catch (error) {
-    if ("phone" in payload && isMissingPhoneColumnError(error)) {
-      const fallbackPayload = { ...payload };
-      delete fallbackPayload.phone;
-      return supabaseInsert("contact_submissions", fallbackPayload);
-    }
-
-    throw error;
-  }
+  return supabaseRpc("submit_contact", {
+    contact_name: payload.name,
+    contact_email: payload.email,
+    contact_phone: payload.phone || null,
+    contact_company: payload.company,
+    contact_goal: payload.goal,
+    contact_language: payload.language,
+    contact_page_path: payload.page_path,
+    contact_referrer: payload.referrer,
+    contact_user_agent: payload.user_agent,
+    contact_visitor_id: payload.visitor_id,
+    contact_session_id: payload.session_id,
+  });
 }
 
 function baseTrackingPayload() {
@@ -105,7 +106,18 @@ function trackEvent(eventName, details = {}) {
     },
   };
 
-  supabaseInsert("analytics_events", payload).catch(() => {});
+  supabaseRpc("track_analytics_event", {
+    tracked_event_name: payload.event_name,
+    tracked_page_path: payload.page_path,
+    tracked_page_title: payload.page_title,
+    tracked_element_label: payload.element_label || null,
+    tracked_element_href: payload.element_href || null,
+    tracked_section_id: payload.section_id || null,
+    tracked_language: payload.language,
+    tracked_visitor_id: payload.visitor_id,
+    tracked_session_id: payload.session_id,
+    tracked_metadata: payload.metadata,
+  }).catch(() => {});
 }
 
 function contactPayloadFromForm(contactForm) {
@@ -636,7 +648,6 @@ form?.addEventListener("submit", async (event) => {
     await submitContactSubmission(payload);
     trackEvent("contact_submit", {
       metadata: {
-        company: payload.company,
         goal: payload.goal,
         has_company: Boolean(payload.company),
       },

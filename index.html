@@ -3,6 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://cvfxiiyudzyuixkkxbaf.supabase.co; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests" />
     <title>HGK | Tecnologia para empresas que fazem acontecer</title>
     <meta
       name="description"
@@ -249,19 +251,19 @@
         <form class="contact-form" aria-label="Formulário de contato" data-i18n-aria-label="form.label">
           <label>
             <span data-i18n="form.name">Nome</span>
-            <input type="text" name="nome" autocomplete="name" placeholder="Seu nome" data-i18n-placeholder="form.namePlaceholder" required />
+            <input type="text" name="nome" autocomplete="name" maxlength="120" placeholder="Seu nome" data-i18n-placeholder="form.namePlaceholder" required />
           </label>
           <label>
             <span data-i18n="form.email">E-mail</span>
-            <input type="email" name="email" autocomplete="email" placeholder="voce@empresa.com" data-i18n-placeholder="form.emailPlaceholder" required />
+            <input type="email" name="email" autocomplete="email" maxlength="254" placeholder="voce@empresa.com" data-i18n-placeholder="form.emailPlaceholder" required />
           </label>
           <label>
             <span data-i18n="form.phone">WhatsApp</span>
-            <input type="tel" name="telefone" autocomplete="tel" placeholder="(11) 99999-9999" data-i18n-placeholder="form.phonePlaceholder" />
+            <input type="tel" name="telefone" autocomplete="tel" maxlength="32" placeholder="(11) 99999-9999" data-i18n-placeholder="form.phonePlaceholder" />
           </label>
           <label>
             <span data-i18n="form.company">Empresa</span>
-            <input type="text" name="empresa" autocomplete="organization" placeholder="Nome da empresa" data-i18n-placeholder="form.companyPlaceholder" />
+            <input type="text" name="empresa" autocomplete="organization" maxlength="160" placeholder="Nome da empresa" data-i18n-placeholder="form.companyPlaceholder" />
           </label>
           <label>
             <span data-i18n="form.goal">Objetivo</span>
