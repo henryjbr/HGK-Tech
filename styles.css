@@ -4016,10 +4016,13 @@ h3 {
     display: none;
     flex-direction: column;
     gap: 0;
+    max-height: calc(100dvh - 76px);
     padding: 16px 22px 24px;
     color: var(--ink);
     background: #fff;
     box-shadow: 0 20px 30px rgba(17, 24, 39, 0.12);
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
   .main-nav.is-open {
@@ -4027,8 +4030,16 @@ h3 {
   }
 
   .main-nav a {
+    width: 100%;
     padding: 16px 0;
+    color: var(--ink);
     border-bottom: 1px solid var(--line);
+  }
+
+  .main-nav a:hover,
+  .main-nav a:focus-visible,
+  .main-nav a:active {
+    color: var(--primary);
   }
 
   .main-nav a::after {

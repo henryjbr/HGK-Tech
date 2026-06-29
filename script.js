@@ -629,6 +629,23 @@ nav?.addEventListener("click", (event) => {
   toggle.setAttribute("aria-expanded", "false");
 });
 
+document.addEventListener("keydown", (event) => {
+  if (event.key !== "Escape" || !nav?.classList.contains("is-open")) return;
+  nav.classList.remove("is-open");
+  document.body.classList.remove("nav-open");
+  header?.classList.remove("nav-active");
+  toggle?.setAttribute("aria-expanded", "false");
+  toggle?.focus();
+});
+
+window.addEventListener("resize", () => {
+  if (window.innerWidth <= 980 || !nav?.classList.contains("is-open")) return;
+  nav.classList.remove("is-open");
+  document.body.classList.remove("nav-open");
+  header?.classList.remove("nav-active");
+  toggle?.setAttribute("aria-expanded", "false");
+});
+
 form?.addEventListener("focusin", () => {
   if (contactFormStarted) return;
   contactFormStarted = true;
