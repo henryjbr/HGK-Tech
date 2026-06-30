@@ -33,13 +33,14 @@ Não copie o conteúdo de `vault.decrypted_secrets`, não coloque uma
 
 ## APK
 
-`HGK-Dashboard-debug.apk` é instalável diretamente para testes internos e vem
-assinado com a chave de depuração do Android. No celular, permita a instalação
-desse arquivo quando o Android solicitar.
+`HGK-Dashboard.apk` é o APK de produção assinado da HGK. Gere uma nova cópia
+com `npm run android:release`. No celular, permita a instalação desse arquivo
+quando o Android solicitar.
 
-Para Google Play ou distribuição externa, gere uma chave privada de release,
-guarde-a em um gerenciador de segredos e produza um AAB/APK de release. Nunca
-versione `.jks`, `keystore.properties` ou senhas de assinatura.
+A chave `android/hgk-release.jks` e o arquivo `android/keystore.properties`
+devem ser guardados juntos em um gerenciador de segredos e em backup seguro.
+Sem eles não é possível publicar atualizações sobre o aplicativo instalado.
+Nunca versione `.jks`, `keystore.properties` ou senhas de assinatura.
 
 O aplicativo desativa backup, captura de tela, tráfego HTTP, conteúdo misto e
 depuração do WebView. A sessão administrativa permanece apenas em memória e

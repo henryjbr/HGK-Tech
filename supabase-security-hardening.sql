@@ -554,5 +554,11 @@ grant execute on function public.update_contact_status(uuid, text) to authentica
 grant execute on function public.record_dashboard_login(text, text) to authenticated;
 grant execute on function public.list_dashboard_logins() to authenticated;
 grant execute on function public.authorize_dashboard_member(text, text) to authenticated;
+grant usage on schema public to authenticated;
+grant select on public.analytics_daily_summary to authenticated;
+grant select on public.dashboard_admins to authenticated;
 
 commit;
+
+-- Atualiza imediatamente o cache de rotas da API após criar funções e grants.
+notify pgrst, 'reload schema';

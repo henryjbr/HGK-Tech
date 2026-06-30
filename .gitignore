@@ -7,6 +7,8 @@ android/app/build/
 android/local.properties
 android-sdk/
 android-commandlinetools.zip
+dist-windows/
+HGK-Dashboard-Windows-Setup.exe
 *.jks
 *.keystore
 keystore.properties

@@ -141,11 +141,15 @@ async function request(path, options = {}) {
   }
 
   if (!response.ok) {
+    const errorBody = await response.json().catch(() => ({}));
     if (response.status === 401) {
       clearSession();
       showLogin("Sessao expirada. Entre novamente.");
     }
-    throw new Error(`Erro ${response.status}`);
+    if (response.status === 404) {
+      throw new Error("API do dashboard indisponivel. Atualize as funcoes e permissoes no Supabase.");
+    }
+    throw new Error(errorBody.message || `Erro ${response.status}`);
   }
 
   if (response.status === 204) return null;

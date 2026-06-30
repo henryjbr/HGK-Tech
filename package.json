@@ -1,18 +1,56 @@
 {
-  "name": "hgk-dashboard-mobile",
-  "version": "1.0.0",
+  "name": "hgk-dashboard",
+  "version": "1.0.1",
   "private": true,
-  "description": "Aplicativo Android seguro para o dashboard HGK",
+  "description": "Aplicativos Android e Windows para o dashboard HGK",
+  "author": "HGK Tech",
+  "main": "desktop/main.cjs",
   "scripts": {
     "build:web": "node tools/build-mobile.mjs",
     "android:sync": "npm run build:web && npx cap sync android",
-    "android:apk": "npm run android:sync && cd android && gradlew.bat assembleDebug"
-  },
-  "dependencies": {
-    "@capacitor/android": "8.4.1",
-    "@capacitor/core": "8.4.1"
+    "android:apk": "npm run android:sync && cd android && gradlew.bat assembleDebug",
+    "android:release": "npm run android:sync && cd android && gradlew.bat --no-daemon --no-problems-report assembleRelease && copy /Y app\\build\\outputs\\apk\\release\\app-release.apk ..\\HGK-Dashboard.apk",
+    "desktop:start": "electron .",
+    "desktop:build": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/build-desktop-light.ps1",
+    "desktop:build:electron": "node tools/build-desktop.mjs"
   },
   "devDependencies": {
-    "@capacitor/cli": "8.4.1"
+    "@capacitor/android": "^8.4.1",
+    "@capacitor/cli": "8.4.1",
+    "@capacitor/core": "^8.4.1",
+    "electron": "^42.5.1",
+    "electron-builder": "^26.15.3",
+    "png-to-ico": "^3.0.1"
+  },
+  "build": {
+    "appId": "com.hgktech.dashboard.desktop",
+    "productName": "HGK Dashboard",
+    "artifactName": "HGK-Dashboard-Setup-${version}.${ext}",
+    "asar": true,
+    "directories": {
+      "output": "dist-windows"
+    },
+    "files": [
+      "dashboard.html",
+      "dashboard.css",
+      "dashboard.js",
+      "supabase-config.js",
+      "assets/**/*",
+      "desktop/**/*",
+      "package.json"
+    ],
+    "win": {
+      "icon": "desktop/icon.ico",
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "HGK Dashboard"
+    }
   }
 }
