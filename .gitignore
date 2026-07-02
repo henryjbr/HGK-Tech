@@ -6,9 +6,10 @@ android/build/
 android/app/build/
 android/local.properties
 android-sdk/
-android-commandlinetools.zip
 dist-windows/
-HGK-Dashboard-Windows-Setup.exe
+releases/windows/HGK-Dashboard-Windows-Setup.exe
+.chrome-test-profile/
+*-test.png
 *.jks
 *.keystore
 keystore.properties

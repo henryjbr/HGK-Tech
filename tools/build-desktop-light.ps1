@@ -10,6 +10,12 @@ $build = "D:\Temp\hgk-dashboard-light-build"
 $stage = Join-Path $build "stage"
 $app = Join-Path $stage "app"
 $installer = Join-Path $build "HGK-Dashboard-Windows-Setup.exe"
+$releases = Join-Path $root "releases\windows"
+
+& npm.cmd --prefix $root run build:site
+if ($LASTEXITCODE -ne 0) {
+  throw "Falha ao preparar os arquivos do site."
+}
 
 if (-not $build.EndsWith("hgk-dashboard-light-build", [StringComparison]::OrdinalIgnoreCase)) {
   throw "Diretorio temporario inseguro: $build"
@@ -19,6 +25,7 @@ if (Test-Path -LiteralPath $build) {
   Remove-Item -LiteralPath $build -Recurse -Force
 }
 New-Item -ItemType Directory -Path $app -Force | Out-Null
+New-Item -ItemType Directory -Path $releases -Force | Out-Null
 
 $core = Join-Path $sdk "lib\net462\Microsoft.Web.WebView2.Core.dll"
 $winForms = Join-Path $sdk "lib\net462\Microsoft.Web.WebView2.WinForms.dll"
@@ -30,12 +37,13 @@ foreach ($required in @($core, $winForms, $loader)) {
 }
 
 Copy-Item -LiteralPath $core, $winForms, $loader -Destination $stage
-Copy-Item -LiteralPath (Join-Path $root "dashboard.html") -Destination $app
-Copy-Item -LiteralPath (Join-Path $root "dashboard.html") -Destination (Join-Path $app "index.html")
-Copy-Item -LiteralPath (Join-Path $root "dashboard.css") -Destination $app
-Copy-Item -LiteralPath (Join-Path $root "dashboard.js") -Destination $app
-Copy-Item -LiteralPath (Join-Path $root "supabase-config.js") -Destination $app
-Copy-Item -LiteralPath (Join-Path $root "assets") -Destination $app -Recurse
+Copy-Item -LiteralPath (Join-Path $root "dist\dashboard.html") -Destination $app
+Copy-Item -LiteralPath (Join-Path $root "dist\dashboard.html") -Destination (Join-Path $app "index.html")
+Copy-Item -LiteralPath (Join-Path $root "dist\dashboard.css") -Destination $app
+Copy-Item -LiteralPath (Join-Path $root "dist\bundle.dashboard.js") -Destination $app
+Copy-Item -LiteralPath (Join-Path $root "dist\supabase-config.js") -Destination $app
+Copy-Item -LiteralPath (Join-Path $root "dist\assinatura-email-hgk-compativel.html") -Destination $app
+Copy-Item -LiteralPath (Join-Path $root "dist\assets") -Destination $app -Recurse
 
 $csc = "C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe"
 $source = Join-Path $root "desktop-light\HgkDashboard.cs"
@@ -69,5 +77,5 @@ if ($LASTEXITCODE -ne 0) {
   throw "Falha ao gerar o instalador leve."
 }
 
-Copy-Item -LiteralPath $installer -Destination (Join-Path $root "HGK-Dashboard-Windows-Leve-Setup.exe") -Force
+Copy-Item -LiteralPath $installer -Destination (Join-Path $releases "HGK-Dashboard-Windows-Leve-Setup.exe") -Force
 Write-Output "Instalador WebView2 criado."

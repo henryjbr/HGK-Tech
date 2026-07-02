@@ -3,11 +3,10 @@
 ## Banco de dados
 
 1. Faça um backup do projeto Supabase.
-2. No SQL Editor, execute `supabase-schema.sql` caso o banco ainda não exista.
-3. Execute `supabase-security-hardening.sql` inteiro. Ele roda em transação:
+2. No SQL Editor, execute `src/supabase-schema.sql` caso o banco ainda não exista.
+3. Execute `src/supabase-security-hardening.sql` inteiro. Ele roda em transação:
    se uma etapa falhar, nenhuma alteração é confirmada.
-4. Publique `index.html`, `script.js`, `dashboard.html`, `dashboard.js`,
-   `supabase-config.js` e `_headers` juntos.
+4. Execute `npm run build` e publique o conteúdo de `dist/`.
 
 A migração cifra os dados pessoais existentes com AES-256. A chave aleatória
 fica no Supabase Vault, separada das tabelas e dos backups. O site passa a
@@ -33,7 +32,7 @@ Não copie o conteúdo de `vault.decrypted_secrets`, não coloque uma
 
 ## APK
 
-`HGK-Dashboard.apk` é o APK de produção assinado da HGK. Gere uma nova cópia
+`releases/android/HGK-Dashboard.apk` é o APK de produção assinado da HGK. Gere uma nova cópia
 com `npm run android:release`. No celular, permita a instalação desse arquivo
 quando o Android solicitar.
 
@@ -43,8 +42,9 @@ Sem eles não é possível publicar atualizações sobre o aplicativo instalado.
 Nunca versione `.jks`, `keystore.properties` ou senhas de assinatura.
 
 O aplicativo desativa backup, captura de tela, tráfego HTTP, conteúdo misto e
-depuração do WebView. A sessão administrativa permanece apenas em memória e
-expira após 15 minutos de inatividade.
+depuração do WebView. A sessão administrativa é persistida localmente e renovada
+automaticamente até que o usuário faça logout, revogue o acesso ou limpe os
+dados do aplicativo.
 
 ## Operação
 

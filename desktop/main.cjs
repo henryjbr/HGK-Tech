@@ -40,7 +40,7 @@ function createWindow() {
     }
   });
 
-  void window.loadFile(path.join(__dirname, "..", "dashboard.html"));
+  void window.loadFile(path.join(__dirname, "..", "dist", "dashboard.html"));
 }
 
 const hasSingleInstanceLock = app.requestSingleInstanceLock();

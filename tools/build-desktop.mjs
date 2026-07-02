@@ -6,6 +6,7 @@ import { spawn } from "node:child_process";
 import pngToIco from "png-to-ico";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const releases = resolve(root, "releases", "windows");
 const output = process.env.HGK_DESKTOP_BUILD_DIR
   ? resolve(process.env.HGK_DESKTOP_BUILD_DIR)
   : join(tmpdir(), "hgk-dashboard-windows-build");
@@ -17,6 +18,7 @@ if (output === dirname(output) || !output.toLowerCase().endsWith("hgk-dashboard-
 
 const icon = await pngToIco(join(root, "desktop", "icon.png"));
 await writeFile(join(root, "desktop", "icon.ico"), icon);
+await mkdir(releases, { recursive: true });
 
 await rm(output, { recursive: true, force: true });
 await mkdir(output, { recursive: true });
@@ -46,6 +48,6 @@ if (!installer) {
   throw new Error("Instalador Windows nao encontrado.");
 }
 
-const destination = join(root, "HGK-Dashboard-Windows-Setup.exe");
+const destination = join(releases, "HGK-Dashboard-Windows-Setup.exe");
 await copyFile(join(output, installer), destination);
 console.log(`Instalador Windows criado em ${destination}`);

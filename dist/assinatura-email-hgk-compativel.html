@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Assinatura de e-mail | HGK Tech</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        padding: 48px 20px;
+        color: #10233f;
+        background:
+          radial-gradient(circle at 85% 10%, rgba(50, 126, 213, 0.18), transparent 26%),
+          #edf3fa;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      .page {
+        width: min(760px, 100%);
+        margin: 0 auto;
+      }
+
+      .instructions {
+        margin-bottom: 22px;
+      }
+
+      .instructions h1 {
+        margin: 0 0 8px;
+        font-size: 24px;
+      }
+
+      .instructions p {
+        margin: 0;
+        color: #52657d;
+        font-size: 14px;
+        line-height: 1.55;
+      }
+
+      .preview {
+        padding: 34px;
+        overflow-x: auto;
+        background: #ffffff;
+        border: 1px solid #d8e3ef;
+        border-radius: 16px;
+        box-shadow: 0 18px 50px rgba(18, 50, 88, 0.12);
+      }
+
+      .signature-menu {
+        display: inline-flex;
+        gap: 6px;
+        margin-bottom: 18px;
+        padding: 5px;
+        border: 1px solid #d8e3ef;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.72);
+      }
+
+      .signature-menu button {
+        color: #52657d;
+        background: transparent;
+      }
+
+      .signature-menu button[aria-selected="true"] {
+        color: #ffffff;
+        background: #1f70c9;
+      }
+
+      .use-guide {
+        display: grid;
+        gap: 16px;
+        padding: 26px;
+        border: 1px solid #d8e3ef;
+        border-radius: 16px;
+        background: #ffffff;
+        box-shadow: 0 18px 50px rgba(18, 50, 88, 0.09);
+      }
+
+      .use-guide article {
+        padding: 18px;
+        border: 1px solid #d8e3ef;
+        border-radius: 12px;
+        background: #f7faff;
+      }
+
+      .use-guide h2 {
+        margin: 0 0 8px;
+        font-size: 17px;
+      }
+
+      .use-guide ol {
+        margin: 0;
+        padding-left: 20px;
+        color: #52657d;
+        font-size: 14px;
+        line-height: 1.65;
+      }
+
+      .actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 22px;
+      }
+
+      button {
+        padding: 11px 18px;
+        color: #ffffff;
+        background: #1f70c9;
+        border: 0;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background: #155ba5;
+      }
+
+      #feedback {
+        color: #187148;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      [contenteditable="true"] {
+        outline: none;
+      }
+
+      [contenteditable="true"]:focus {
+        border-radius: 3px;
+        box-shadow: 0 0 0 2px rgba(117, 180, 255, 0.65);
+      }
+
+      [hidden] {
+        display: none !important;
+      }
+
+      @media (max-width: 680px) {
+        body {
+          padding: 28px 12px;
+        }
+
+        .preview {
+          padding: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="instructions">
+        <h1>Assinatura HGK Tech</h1>
+        <p>
+          Clique nos dados do cartão para personalizá-los. Em seguida, copie a
+          assinatura e cole nas configurações do Gmail ou Outlook.
+        </p>
+      </section>
+
+      <nav class="signature-menu" role="tablist" aria-label="Menu da assinatura">
+        <button type="button" role="tab" aria-selected="true" data-signature-tab="create">Criar assinatura</button>
+        <button type="button" role="tab" aria-selected="false" data-signature-tab="use">Como usar</button>
+      </nav>
+
+      <section class="preview" data-signature-panel="create">
+        <div id="signature">
+          <style>
+            @keyframes hgk-gear-clockwise {
+              to { transform: rotate(360deg); }
+            }
+
+            @keyframes hgk-gear-counterclockwise {
+              to { transform: rotate(-360deg); }
+            }
+
+            .hgk-signature-gear {
+              position: absolute;
+              z-index: 2;
+              display: block;
+              font-family: "Segoe UI Symbol", Arial, sans-serif;
+              line-height: 1;
+              transform-origin: 50% 50%;
+            }
+
+            .hgk-signature-gear-one {
+              animation: hgk-gear-clockwise 5s linear infinite;
+            }
+
+            .hgk-signature-gear-two {
+              animation: hgk-gear-counterclockwise 6.5s linear infinite;
+            }
+
+            .hgk-signature-gear-three {
+              animation: hgk-gear-clockwise 5.5s linear infinite;
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+              .hgk-signature-gear {
+                animation: none;
+              }
+            }
+          </style>
+          <div
+            style="position: relative; width: 620px; max-width: 100%; overflow: hidden; background-color: #071a32; background-image: linear-gradient(100deg, #020914 0%, #0a294f 58%, #2d75c5 100%); border-radius: 18px; box-shadow: 0 10px 24px rgba(5, 25, 50, 0.2);"
+          >
+            <table
+              role="presentation"
+              cellpadding="0"
+              cellspacing="0"
+              border="0"
+              style="position: relative; z-index: 1; width: 620px; max-width: 100%; border-collapse: separate; border-spacing: 0; color: #ffffff; background: transparent; border-radius: 18px; overflow: hidden; font-family: Arial, Helvetica, sans-serif;"
+            >
+            <tr>
+              <td
+                width="390"
+                style="width: 390px; padding: 31px 18px 27px 34px; vertical-align: middle; background-color: transparent; border-radius: 18px 0 0 18px;"
+              >
+                <div
+                  contenteditable="true"
+                  style="margin: 0; color: #ffffff; font-size: 25px; line-height: 1.25; font-weight: 700; letter-spacing: 0.2px;"
+                >
+                  Nome Sobrenome
+                </div>
+                <div
+                  contenteditable="true"
+                  style="margin: 7px 0 24px; color: #a9d2ff; font-size: 14px; line-height: 1.4; font-weight: 700;"
+                >
+                  HGK Tech
+                </div>
+
+                <table
+                  role="presentation"
+                  cellpadding="0"
+                  cellspacing="0"
+                  border="0"
+                  style="border-collapse: collapse; color: #ffffff; font-family: Arial, Helvetica, sans-serif; font-size: 13px; line-height: 1.55;"
+                >
+                  <tr>
+                    <td
+                      width="34"
+                      style="width: 34px; padding: 3px 10px 3px 0; vertical-align: middle;"
+                    >
+                      <span style="display: inline-block; width: 24px; height: 24px; color: #b9dcff; background: rgba(157, 204, 255, 0.1); border: 1px solid rgba(157, 204, 255, 0.18); border-radius: 7px; line-height: 22px; text-align: center;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display: inline-block; vertical-align: middle;">
+                          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.9.33 1.78.62 2.63a2 2 0 0 1-.45 2.11L8 9.73a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.85.29 1.73.5 2.63.62A2 2 0 0 1 22 16.92z" />
+                        </svg>
+                      </span>
+                    </td>
+                    <td contenteditable="true" style="padding: 3px 0; color: #ffffff; vertical-align: middle;">
+                      +55 (11) 90000-0000
+                    </td>
+                  </tr>
+                  <tr>
+                    <td
+                      width="34"
+                      style="width: 34px; padding: 3px 10px 3px 0; vertical-align: middle;"
+                    >
+                      <span style="display: inline-block; width: 24px; height: 24px; color: #b9dcff; background: rgba(157, 204, 255, 0.1); border: 1px solid rgba(157, 204, 255, 0.18); border-radius: 7px; line-height: 22px; text-align: center;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display: inline-block; vertical-align: middle;">
+                          <rect x="3" y="5" width="18" height="14" rx="2" />
+                          <path d="m3 7 9 6 9-6" />
+                        </svg>
+                      </span>
+                    </td>
+                    <td contenteditable="true" style="padding: 3px 0; color: #ffffff; vertical-align: middle;">
+                      nome@hgktech.com.br
+                    </td>
+                  </tr>
+                  <tr>
+                    <td
+                      width="34"
+                      style="width: 34px; padding: 3px 10px 3px 0; vertical-align: middle;"
+                    >
+                      <span style="display: inline-block; width: 24px; height: 24px; color: #b9dcff; background: rgba(157, 204, 255, 0.1); border: 1px solid rgba(157, 204, 255, 0.18); border-radius: 7px; line-height: 22px; text-align: center;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display: inline-block; vertical-align: middle;">
+                          <circle cx="12" cy="12" r="9" />
+                          <path d="M3 12h18M12 3a14.6 14.6 0 0 1 0 18M12 3a14.6 14.6 0 0 0 0 18" />
+                        </svg>
+                      </span>
+                    </td>
+                    <td style="padding: 3px 0; vertical-align: middle;">
+                      <a
+                        href="https://hgk-tech-xc8y.vercel.app/"
+                        target="_blank"
+                        style="color: #ffffff; text-decoration: none;"
+                      >hgk-tech-xc8y.vercel.app</a>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+
+              <td
+                width="230"
+                style="width: 230px; height: 230px; padding: 0; overflow: hidden; vertical-align: middle; background-color: transparent; border-radius: 0 18px 18px 0; line-height: 0;"
+              >
+                <a
+                  href="https://hgk-tech-xc8y.vercel.app/"
+                  target="_blank"
+                  style="position: relative; display: block; width: 230px; height: 230px; overflow: hidden; border-radius: 0 18px 18px 0; text-decoration: none;"
+                >
+                  <img
+                    src="https://hgk-tech-xc8y.vercel.app/assets/email-logo-transparent.png"
+                    width="230"
+                    alt="HGK Tech"
+                    style="display: block; width: 230px; max-width: 230px; height: auto; border: 0; clip-path: inset(0 28% 0 0);"
+                  />
+                  <span
+                    class="hgk-signature-gear hgk-signature-gear-one"
+                    style="left: 162px; top: 89px; color: #b9c4ce; font-size: 29px;"
+                  >&#9881;</span>
+                  <span
+                    class="hgk-signature-gear hgk-signature-gear-two"
+                    style="left: 182px; top: 82px; color: #ffffff; font-size: 36px;"
+                  >&#9881;</span>
+                  <span
+                    class="hgk-signature-gear hgk-signature-gear-three"
+                    style="left: 174px; top: 108px; color: #a9d2ff; font-size: 34px;"
+                  >&#9881;</span>
+                </a>
+              </td>
+            </tr>
+            </table>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="copy-button" type="button">Copiar assinatura</button>
+          <span id="feedback" role="status" aria-live="polite"></span>
+        </div>
+      </section>
+
+      <section class="use-guide" data-signature-panel="use" hidden>
+        <article>
+          <h2>Usar no Gmail</h2>
+          <ol>
+            <li>Na aba “Criar assinatura”, personalize os dados e clique em “Copiar assinatura”.</li>
+            <li>No Gmail, abra Configurações → Ver todas as configurações.</li>
+            <li>Na seção Assinatura, crie uma nova e cole o conteúdo copiado.</li>
+            <li>Escolha a assinatura como padrão e salve as alterações.</li>
+          </ol>
+        </article>
+        <article>
+          <h2>Usar no Outlook</h2>
+          <ol>
+            <li>Copie a assinatura pronta na aba “Criar assinatura”.</li>
+            <li>No Outlook, abra Configurações → Contas → Assinaturas.</li>
+            <li>Crie uma nova assinatura, cole o conteúdo e defina quando ela será usada.</li>
+            <li>Salve e envie um e-mail de teste para conferir o resultado.</li>
+          </ol>
+        </article>
+      </section>
+    </main>
+
+    <script>
+      const copyButton = document.querySelector("#copy-button");
+      const signature = document.querySelector("#signature");
+      const feedback = document.querySelector("#feedback");
+      const tabButtons = document.querySelectorAll("[data-signature-tab]");
+      const tabPanels = document.querySelectorAll("[data-signature-panel]");
+
+      tabButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const selectedTab = button.dataset.signatureTab;
+
+          tabButtons.forEach((item) => {
+            item.setAttribute("aria-selected", String(item === button));
+          });
+
+          tabPanels.forEach((panel) => {
+            panel.hidden = panel.dataset.signaturePanel !== selectedTab;
+          });
+        });
+      });
+
+      copyButton.addEventListener("click", async () => {
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(signature);
+        selection.removeAllRanges();
+        selection.addRange(range);
+
+        try {
+          await navigator.clipboard.write([
+            new ClipboardItem({
+              "text/html": new Blob([signature.innerHTML], { type: "text/html" }),
+              "text/plain": new Blob([signature.innerText], { type: "text/plain" }),
+            }),
+          ]);
+          feedback.textContent = "Assinatura copiada!";
+        } catch {
+          document.execCommand("copy");
+          feedback.textContent = "Assinatura copiada!";
+        } finally {
+          selection.removeAllRanges();
+          window.setTimeout(() => {
+            feedback.textContent = "";
+          }, 2500);
+        }
+      });
+    </script>
+  </body>
+</html>
